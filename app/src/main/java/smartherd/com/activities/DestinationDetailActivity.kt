@@ -4,13 +4,18 @@ import android.content.Intent
 import android.os.Bundle
 
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.smartherd.globoflies.R
 
 import com.smartherd.globofly.helpers.SampleData
 import com.smartherd.globofly.models.Destination
 import kotlinx.android.synthetic.main.activity_destiny_detail.*
-
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import smartherd.com.services.DestinationService
+import smartherd.com.services.ServiceBuilder
 
 
 class DestinationDetailActivity : AppCompatActivity() {
@@ -40,15 +45,36 @@ class DestinationDetailActivity : AppCompatActivity() {
 	private fun loadDetails(id: Int) {
 
 		// To be replaced by retrofit code
-		val destination = SampleData.getDestinationById(id)
+		//val destination = SampleData.getDestinationById(id)
 
-		destination?.let {
-			et_city.setText(destination.city)
-			et_description.setText(destination.description)
-			et_country.setText(destination.country)
 
-			collapsing_toolbar.title = destination.city
-		}
+		val destinationService=ServiceBuilder.buildService(DestinationService::class.java)
+		val requestCall=destinationService.getDestination(id)
+		requestCall.enqueue(object : Callback<Destination> {
+			override fun onResponse(call: Call<Destination>, response: Response<Destination>) {
+				if(response.isSuccessful) {
+					val destination = response.body()
+					destination?.let {
+						et_city.setText(destination.city)
+						et_description.setText(destination.description)
+						et_country.setText(destination.country)
+
+						collapsing_toolbar.title = destination.city
+					}
+				}
+					else{
+					Toast.makeText(this@DestinationDetailActivity,"cannot reterive data",Toast.LENGTH_SHORT).show()
+				}
+
+
+	}
+
+
+			override fun onFailure(call: Call<Destination>, t: Throwable) {
+			Toast.makeText(this@DestinationDetailActivity,"Failed to get data",Toast.LENGTH_SHORT).show()
+			}
+
+		})
 	}
 
 	private fun initUpdateButton(id: Int) {

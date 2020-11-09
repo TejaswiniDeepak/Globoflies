@@ -2,13 +2,20 @@ package com.smartherd.globofly.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 
 import androidx.appcompat.app.AppCompatActivity
 import com.smartherd.globoflies.R
 
 import smartherd.com.helpers.DestinationAdapter
-import com.smartherd.globofly.helpers.SampleData
+import com.smartherd.globofly.models.Destination
 import kotlinx.android.synthetic.main.activity_destiny_list.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import smartherd.com.services.DestinationService
+import smartherd.com.services.ServiceBuilder
 
 
 class DestinationListActivity : AppCompatActivity() {
@@ -35,6 +42,33 @@ class DestinationListActivity : AppCompatActivity() {
 	private fun loadDestinations() {
 
         // To be replaced by retrofit code
-		destiny_recycler_view.adapter = DestinationAdapter(SampleData.DESTINATIONS)
+		//destiny_recycler_view.adapter = DestinationAdapter(SampleData.DESTINATIONS)
+
+		val destinationService=ServiceBuilder.buildService(DestinationService::class.java)
+		val requestCall=destinationService.getDestinationList("Japan")
+		requestCall.enqueue(object :Callback<List<Destination>>
+		{
+			override fun onResponse(
+				call: Call<List<Destination>>,
+				response: Response<List<Destination>>
+			) {
+				if(response.isSuccessful)
+				{
+					val destinationList=response.body()!!
+
+					destiny_recycler_view.adapter = DestinationAdapter(destinationList)
+				}
+				else
+				{
+					Toast.makeText(this@DestinationListActivity,"data couldnt be reterived",
+							Toast.LENGTH_SHORT).show()
+				}
+			}
+
+			override fun onFailure(call: Call<List<Destination>>, t: Throwable) {
+Log.i("failure","$t")
+			}
+
+		})
     }
 }

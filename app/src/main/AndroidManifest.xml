@@ -10,12 +10,14 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
         android:theme="@style/AppTheme">
 
         <activity
             android:name="com.smartherd.globofly.activities.DestinationListActivity"
             android:label="Destination List"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            />
 
         <activity
             android:name="com.smartherd.globofly.activities.DestinationDetailActivity"
