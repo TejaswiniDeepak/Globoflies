@@ -86,13 +86,24 @@ class DestinationDetailActivity : AppCompatActivity() {
 			val country = et_country.text.toString()
 
             // To be replaced by retrofit code
-            val destination = Destination()
-            destination.id = id
-            destination.city = city
-            destination.description = description
-            destination.country = country
+           val service=ServiceBuilder.buildService(DestinationService::class.java)
+			val requestCall=service.updateDestination(id,city,description,country)
+			requestCall.enqueue(object : Callback<Destination> {
+				override fun onResponse(call: Call<Destination>, response: Response<Destination>) {
+					if(response.isSuccessful) {
+						Toast.makeText(this@DestinationDetailActivity, "Record updated successfully", Toast.LENGTH_SHORT).show()
+					}
+					else
+					{
+						Toast.makeText(this@DestinationDetailActivity,"Failed to Record update",Toast.LENGTH_SHORT).show()
+					}
+				}
 
-            SampleData.updateDestination(destination);
+				override fun onFailure(call: Call<Destination>, t: Throwable) {
+					Toast.makeText(this@DestinationDetailActivity,"Failed to Record update",Toast.LENGTH_SHORT).show()
+				}
+
+			})
             finish() // Move back to DestinationListActivity
 		}
 	}
@@ -102,7 +113,31 @@ class DestinationDetailActivity : AppCompatActivity() {
 		btn_delete.setOnClickListener {
 
             // To be replaced by retrofit code
-            SampleData.deleteDestination(id)
+			val servicebuilder=ServiceBuilder.buildService(DestinationService::class.java)
+			val callRequest=servicebuilder.deleteDestination(id)
+			callRequest.enqueue(object : Callback<Unit>{
+				override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+					if(response.isSuccessful)
+					{
+						Toast.makeText(this@DestinationDetailActivity,"Record deleted successfully",Toast.LENGTH_SHORT).show()
+
+					}
+					else
+					{
+						Toast.makeText(this@DestinationDetailActivity,"Record deleted Failed",
+								Toast.LENGTH_SHORT).show()
+					}
+				}
+
+				override fun onFailure(call: Call<Unit>, t: Throwable) {
+					Toast.makeText(this@DestinationDetailActivity,"Record deleted Failed",Toast.LENGTH_SHORT).show()
+				}
+
+			})
+
+
+
+            //SampleData.deleteDestination(id)
             finish() // Move back to DestinationListActivity
 		}
 	}
